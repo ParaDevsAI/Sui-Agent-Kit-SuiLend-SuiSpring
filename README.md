@@ -1,60 +1,43 @@
-# Sui Agent Kit: SuiSpring & SuiLend Edition 🚀
-
-**Unlock the power of AI on the Sui Blockchain. Your agent's intelligent gateway to DeFi.**
+# Sui Agent Kit 🤖🌊 — Your Gateway to Automated DeFi on SuiLend Protocol
 
 [![Sui Overflow 2025 Submission - Infrastructure & Tooling Track](https://img.shields.io/badge/Sui_Overflow_2025-Infra_&_Tooling-blue?style=for-the-badge)](https://overflowportal.sui.io/)
 
+<img src="/public/banner.png" />
+
+**The Sui Agent Kit was created to simplify DeFi development on the Sui blockchain and empower builders for the Sui Overflow 2025 Hackathon!**
+
+We believe that accessing powerful DeFi protocols like SuiLend should be seamless and programmable. This toolkit abstracts away the complexities of the SuiLend SDK, exposing its features as intuitive "tools" through the Model-Context Protocol (MCP).
+
+Our mission is to provide foundational infrastructure for developers to rapidly prototype, build, and deploy advanced DeFi apps, automation scripts, and AI-powered agents on Sui—especially those leveraging SuiLend’s lending and borrowing capabilities.
+
 ---
-
-## Sui Overflow 2025 Hackathon Submission
-
-**Track:** Infrastructure and Tooling
-
-**Project Name:** Sui Agent Kit SuiSpring SuiLend
-
----
-
-## The Story: From Complex Chains to Intelligent Agents 🧠💻🔗
-
-The world of Decentralized Finance (DeFi) on the Sui blockchain is a universe of exploding opportunity – from innovative lending markets like **Suilend** to groundbreaking liquid staking solutions like **SuiSpring**. Yet, for developers venturing into this space, especially those aiming to integrate the power of Artificial Intelligence, the journey can be a labyrinth of SDKs, protocol-specific nuances, and direct blockchain complexities.
-
-We asked ourselves: *How can we make Sui DeFi truly programmable and accessible for AI? How can we empower AI agents to not just observe, but to act, to strategize, and to automate within this vibrant ecosystem?*
-
-Our answer is the **Sui Agent Kit**.
-
-We are submitting this project to the **Infrastructure and Tooling** track of the Sui Overflow 2025 Hackathon because we believe it provides a critical piece of foundational infrastructure. It's a robust, developer-friendly toolkit designed to significantly lower the barrier to entry for building AI-powered applications on Sui. It's not just about connecting to one protocol; it's about creating a unified, intelligent interface to the rich tapestry of Sui DeFi.
-
-This kit is born from a desire to see AI agents seamlessly navigate and utilize the sophisticated financial instruments offered by protocols like SuiSpring and Suilend, turning complex on-chain operations into simple, manageable tasks for intelligent systems. We aim to empower developers to build the next generation of DeFi applications – ones that are smarter, more autonomous, and more intuitive, all powered by AI on Sui.
 
 ## What is the Sui Agent Kit?
 
-The **Sui Agent Kit: SuiSpring & SuiLend Edition** is a comprehensive backend server, built with TypeScript and Node.js, that leverages the **Model Context Protocol (MCP)**. It acts as an intelligent intermediary, exposing the rich functionalities of core Sui protocols – specifically **MystenSui (base layer)**, **SuiSpring (Liquid Staking)**, and **Suilend (Lending/Borrowing)** – as a set of well-defined, easy-to-use "tools" for AI agents.
+Sui Agent Kit is a Node.js server application built with TypeScript. It bridges simple MCP tool calls to direct SuiLend protocol actions on the Sui blockchain.
 
-**Core Components:**
+---
 
-*   **MCP Server (`src/mcp/server.ts`):** The heart of the kit, implementing an MCP server using `@modelcontextprotocol/sdk`. It defines and registers all available tools.
-*   **Protocol SDK Integrations (`src/protocols/`):** Dedicated modules for each supported protocol, handling SDK client initialization, configuration, and the core logic for each action.
-    *   `mystenSui/`: For base Sui blockchain interactions.
-    *   `springSui/`: For liquid staking with SuiSpring.
-    *   `suilend/`: For lending and borrowing with Suilend.
-*   **Secure Wallet Management (`src/mcp/internalSdkClientManager.ts` & `.env`):** Manages an active Sui wallet (derived from a private key in your `.env` file) for signing and executing transactions.
-*   **Robust Input Validation (`src/mcp/zodSchemas/`):** Utilizes Zod schemas to define and validate the input parameters for every tool, ensuring type safety and clear contracts for AI interaction.
-*   **Configuration (`.env`, `src/protocols/**/config.ts`):** Manages environment variables (RPC URL, private key) and protocol-specific constants (contract addresses, market IDs).
-*   **Common Utilities (`src/common/`):** Shared helper functions for tasks like token amount formatting and address manipulation.
+## Use Cases
 
-## Use Cases: Igniting AI-Powered DeFi on Sui
+- **Automated Health Factor Manager:** Agents that monitor your SuiLend health factor and automatically deposit, withdraw, borrow, or repay to maintain safe collateralization.
+- **Yield Farming Bots:** Agents that optimize asset allocation by monitoring SuiLend rates and opportunities.
+- **DeFi Dashboards:** Web interfaces that offer one-click management of lending actions.
+- **AI-Powered Advisors:** AI agents that analyze user portfolios and SuiLend markets, suggesting and executing optimal strategies.
+- **Custom SuiLend Tooling:** Extend the kit with new or specialized tools for advanced users.
 
-The Sui Agent Kit is designed to be a versatile foundation for a wide array of applications:
+---
 
-*   **🤖 Autonomous DeFi Portfolio Managers:** AI agents that monitor Suilend obligations, assess market conditions, and automatically rebalance collateral, borrow, or repay debt to optimize health factors and manage risk.
-*   💧 **Intelligent Liquid Staking Agents:** Agents that analyze SuiSpring LST (e.g., ParaSUI) yields and exchange rates, automatically staking SUI or redeeming LSTs to maximize returns based on AI-driven strategies.
-*   💹 **Automated Yield Farming Bots:** Sophisticated agents that can combine operations across SuiSpring and Suilend – for example, staking SUI for an LST via SuiSpring, then depositing that LST as collateral in Suilend to borrow other assets for further yield generation.
-*   🗣️ **Conversational DeFi Interfaces:** Build chatbots or voice assistants that use the Sui Agent Kit to translate natural language commands (e.g., "Deposit 50 SUI into my Suilend account and show me my new health factor") into on-chain actions.
-*   📊 **Enhanced DeFi Dashboards & Analytics Platforms:** Power frontends that not only display rich data from Sui protocols but also allow users to execute complex actions with a single click, orchestrated by the Agent Kit in the backend.
-*   🔧 **Custom Tooling & Automation Scripts:** Developers can extend the kit with more specialized tools or build complex automation scripts that chain multiple DeFi operations together for advanced users or DAO treasuries.
-*   💡 **Rapid Prototyping for New DeFi Strategies:** Quickly test and validate new AI-driven DeFi strategies on Sui without getting bogged down in direct SDK integration for each protocol.
+## Core Components
 
-By abstracting the underlying complexity, the Sui Agent Kit empowers developers to focus on the *intelligence* and *strategy* of their AI applications, rather than the intricacies of blockchain interaction.
+- **MCP Server (`src/mcp/server.ts`)** — Implements the MCP server and registers all SuiLend tools.
+- **SuiLend SDK Integration (`src/protocols/suilend/`)** — Manages SDK connections and wallet initialization.
+- **Configuration (`src/protocols/suilend/config.ts`)** — Loads environment variables (RPC URL, wallet credentials, contract addresses).
+- **Input Validation (`src/mcp/zodSchemas/`)** — Zod schemas define and validate input for every tool.
+- **Tool-Based API** — All interactions are exposed as MCP tools, compatible with any MCP client or agent.
+
+---
+
 
 ## Key Features & Capabilities
 
@@ -101,6 +84,82 @@ The Sui Agent Kit provides a rich set of tools, categorized by protocol:
 
 *(Refer to the Zod schema definitions in `src/mcp/zodSchemas/` for detailed input/output structures for each tool).*
 
+---
+
+<details>
+<summary><h1>All Functions </h1></summary>
+
+<ul>
+  <li>
+    <strong>bigNumberReplacer</strong> (<code>src/mcp/mcpUtils.ts</code>)<br>
+    Converts BigNumber and bigint instances to strings for JSON serialization in outputs.
+  </li>
+  <li>
+    <strong>createTextOutput</strong> (<code>src/mcp/mcpUtils.ts</code>)<br>
+    Wraps data in an MCP-friendly text output structure for consistent responses.
+  </li>
+  <li>
+    <strong>createErrorOutput</strong> (<code>src/mcp/mcpUtils.ts</code>)<br>
+    Creates a standard error output for MCP tools, including error details.
+  </li>
+  <li>
+    <strong>handleFormatTokenAmount</strong> (<code>src/mcp/toolHandlers/commonHandlers.ts</code>)<br>
+    Formats a raw token amount to a human-readable string using token decimals.
+  </li>
+  <li>
+    <strong>handleParseTokenAmount</strong> (<code>src/mcp/toolHandlers/commonHandlers.ts</code>)<br>
+    Converts a formatted token amount back to its raw value for contracts.
+  </li>
+  <li>
+    <strong>handleShortenAddress</strong> (<code>src/mcp/toolHandlers/commonHandlers.ts</code>)<br>
+    Shortens a Sui address or object ID for concise display (e.g., <code>0x123...abc</code>).
+  </li>
+  <li>
+    <strong>handleGetCoinTypeBySymbol</strong> (<code>src/mcp/toolHandlers/commonHandlers.ts</code>)<br>
+    Fetches the technical <code>coinType</code> and metadata for a given token symbol and network.
+  </li>
+  <li>
+    <strong>handleGetSuiBalance</strong> (<code>src/mcp/toolHandlers/mystenSuiHandlers.ts</code>)<br>
+    Gets the SUI token balance for the active wallet on a chosen network.
+  </li>
+  <li>
+    <strong>handleGetTokenMetadata</strong> (<code>src/mcp/toolHandlers/mystenSuiHandlers.ts</code>)<br>
+    Fetches metadata (name, symbol, decimals, etc.) for a specified Sui token.
+  </li>
+  <li>
+    <strong>handleGetUserTokenBalance</strong> (<code>src/mcp/toolHandlers/mystenSuiHandlers.ts</code>)<br>
+    Gets the balance of a specific token for the active user wallet.
+  </li>
+  <li>
+    <strong>handleRepayToSuilend</strong> (<code>src/mcp/toolHandlers/suilendHandlers.ts</code>)<br>
+    Handles repayment transactions to the Suilend protocol, ensuring wallet and parameter checks.
+  </li>
+  <li>
+    <strong>main</strong> (<code>src/mcp/server.ts</code>)<br>
+    Entry point for the MCP server: initializes wallet, client manager, and registers tools.
+  </li>
+  <li>
+    <strong>registerMcpTools</strong> (<code>src/mcp/server.ts</code>)<br>
+    Registers all MCP tools (functions) with the server for external calls.
+  </li>
+  <li>
+    <strong>InternalSdkClientManager</strong> (<code>src/mcp/internalSdkClientManager.ts</code>)<br>
+    Class managing SDK client instances and tracks the active user wallet for protocol calls.<br>
+    <ul>
+      <li><code>setActiveUserWallet</code> – Sets the active wallet.</li>
+      <li><code>getActiveUserWallet</code> – Gets the current wallet.</li>
+      <li><code>getActiveUserAddress</code> – Returns the address of the active wallet.</li>
+      <li><code>getSuiClientInstance</code> – Returns a SuiClient for the specified network.</li>
+      <li><code>getSpringSuiLstClientInstance</code> – Gets a Spring SUI LST client instance.</li>
+      <li><code>getSteammSdkInstance</code> – Gets a Steamm SDK instance for a network.</li>
+      <li><code>getSuilendSdkInstance</code> – Gets a Suilend SDK instance for a market/network.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><em>Note: Only the first 10-15 results are shown. For a complete list, review the code in <code>src/mcp/</code> and related handler directories.</em></p>
+</details>
+
 ## Getting Started
 
 Follow these steps to get the Sui Agent Kit up and running on your local machine.
@@ -117,7 +176,7 @@ Follow these steps to get the Sui Agent Kit up and running on your local machine
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/your-username/sui-agent-kit-suispring-suilend.git # Replace with your actual repository URL
+    git clone https://github.com/ParaDevsAI/Sui-Agent-Kit-SuiLend-SuiSpring
     cd sui-agent-kit-suispring-suilend
     ```
 
@@ -187,17 +246,17 @@ Create an `mcp.json` file (e.g., in your user home directory, or wherever your M
 ```json
 {
   "mcpServers": {
-    "sui-agent-kit": { // You can name this server alias anything you like
+    "sui-agent-kit": {
       "command": "node",
       "args": [
-        "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend/dist/main.js" // Path to the compiled JS entry point
+        "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend/dist/main.js"
       ],
-      "cwd": "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend", // Path to the project's root directory
+      "cwd": "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend",
       "env": {
         // Optional: Override or set environment variables here.
         // If SUI_MAINNET_PRIVATE_KEY is in your project's .env, you might not need it here.
         // "SUI_MAINNET_PRIVATE_KEY": "suiprivkey1...from_mcp_json_override", 
-        // "SUI_RPC_URL": "https://fullnode.testnet.sui.io:443" // Example to force testnet via mcp.json
+        // "SUI_RPC_URL": "https://fullnode.testnet.sui.io:443"
       }
     }
   }
@@ -227,7 +286,7 @@ If you prefer to have the MCP Inspector launch your server in development mode (
 {
   "mcpServers": {
     "sui-agent-kit-dev": {
-      "command": "npm", // Or "yarn" if you use yarn
+      "command": "npm",
       "args": [
         "run",
         "dev"
@@ -299,24 +358,8 @@ The Sui Agent Kit is a living project with a bright future:
 *   🔐 **Enhanced Security & Permissioning:** Explore options for more granular control, potentially integrating with wallet standards for delegated execution or multi-sig setups for production agents.
 *   📡 **Real-time Event Streaming:** Enable agents to subscribe to on-chain events for reactive decision-making.
 *   📈 **Comprehensive Test Suite:** Implement extensive unit, integration, and end-to-end tests.
-*   🐍 **Python Client Library:** Develop a dedicated Python client library to make integration even simpler for the Python-centric AI/ML community.
 *   🌐 **Community-Driven Expansion:** Foster a community around the kit to contribute new tools and protocol integrations.
 
 ## Contributing
 
 This project was initiated for the Sui Overflow 2025 Hackathon, and we believe in the power of open collaboration! We enthusiastically welcome contributions. Whether it's reporting bugs, suggesting features, improving documentation, or submitting pull requests for new tools or protocol integrations, your input is valuable.
-
-*(Please create a `CONTRIBUTING.md` file with guidelines if you formalize this process).*
-
-## Meet the Team
-
-*   **[Your Name / Team Name Here]** - Innovators @ Sui Overflow 2025!
-    *   Passionate about the intersection of AI and Decentralized Finance on the Sui Blockchain.
-
-## License
-
-This project is licensed under the MIT License. (You should create a `LICENSE` file in your repository, typically with the MIT License text if that's your choice. For example, you can copy one from [choosealicense.com](https://choosealicense.com/licenses/mit/)).
-
----
-
-Let's build the future of intelligent DeFi on Sui, together! 
