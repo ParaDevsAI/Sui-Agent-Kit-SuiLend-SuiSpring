@@ -38,36 +38,51 @@ Sui Agent Kit is a Node.js server application built with TypeScript. It bridges 
 
 ---
 
+
 ## Key Features & Capabilities
 
-- **📊 Portfolio Management**
-  - `suilend_getUserObligationInfo`: View your lending/borrowing status.
-  - `suilend_getObligationDetails`: See all positions, collateral, borrows, and health factor.
-  - `suilend_getSuilendMarketAssets`: List available assets and market rates.
-  - `suilend_getObligationHistory`: Review all lending/borrowing actions.
+The Sui Agent Kit provides a rich set of tools, categorized by protocol:
 
-- **🌊 Lending Pool Operations**
-  - `suilend_depositToSuilend`: Deposit SUI or supported assets as collateral.
-  - `suilend_withdrawFromSuilend`: Withdraw your collateral.
-  - `suilend_borrowFromSuilend`: Borrow assets against collateral.
-  - `suilend_repayToSuilend`: Repay borrowed assets.
+### ☯️ MystenSui (Core Sui Functionality)
 
-- **💧 Liquid Staking Integration (with SuiSpring)**
-  - `springSui_stakeSuiForParaSui`: Stake SUI for liquid staked tokens.
-  - `springSui_redeemSpringSuiLstForSui`: Redeem LSTs for SUI.
+*   `mystenSui_getSuiBalance`: Fetch the SUI balance for the active agent wallet.
+*   `mystenSui_getTokenMetadata`: Retrieve detailed metadata for any fungible token.
+*   `mystenSui_getUserTokenBalance`: Get the balance of a specific fungible token for the active agent.
+*   `mystenSui_transferSui`: Execute SUI transfers.
+*   `mystenSui_transferSuiToMany`: Transfer SUI to multiple recipients in a single transaction.
+*   `mystenSui_transferFungibleTokensToMany`: Transfer a specific fungible token to multiple recipients.
+*   `mystenSui_getUserRecentTxs`: Fetch recent transaction history for the active agent.
 
-- **💱 Utilities**
-  - `common_getCoinTypeBySymbol`: Get coin type and metadata by symbol.
-  - `common_formatTokenAmount` / `common_parseTokenAmount`: Human-friendly token formatting.
+### 🌱 SuiSpring (Liquid Staking)
 
-- **📈 Market Data**
-  - `suilend_getSuilendMarketAssets`: Live data for all SuiLend assets.
-  - `springSui_getSpringSuiPoolApys`: APYs for liquid staking pools.
+*   `springSui_discoverLstPools`: Discover available Liquid Staking Token (LST) pools.
+*   `springSui_getLstSuiExchangeRate`: Get the current exchange rate between an LST and SUI.
+*   `springSui_getUserLstDetails`: Fetch details about the agent's position in a specific LST (balance, APY, SUI equivalent).
+*   `springSui_getSpringSuiPoolApys`: Get APYs for specific LST pools.
+*   `springSui_stakeSuiForSpringSuiLst`: Stake SUI to mint a generic SpringSui LST.
+*   `springSui_stakeSuiForParaSui`: Specifically stake SUI to obtain ParaSUI.
+*   `springSui_redeemSpringSuiLstForSui`: Redeem an LST back into SUI.
 
-- **✅ Utility**
-  - `ping`: Health check for the Sui Agent Kit server.
+### 🏦 Suilend (Lending & Borrowing)
 
-*See schemas in `src/mcp/zodSchemas/` for detailed tool contracts.*
+*   `suilend_getSuilendMarketAssets`: List supported assets and their current metrics (interest rates, APYs).
+*   `suilend_ensureSuilendObligation`: Check for or create a Suilend obligation (loan account) for the active agent.
+*   `suilend_getUserObligationInfo`: Get the `obligationId` and `ownerCapId` for the active agent's obligation, crucial for most other Suilend actions.
+*   `suilend_depositToSuilend`: Deposit assets as collateral into the agent's obligation.
+*   `suilend_getObligationDetails`: Retrieve a comprehensive report of a specific obligation (collateral, borrows, health factor).
+*   `suilend_withdrawFromSuilend`: Withdraw collateral from an obligation.
+*   `suilend_borrowFromSuilend`: Borrow assets against deposited collateral.
+*   `suilend_repayToSuilend`: Repay a borrowed asset.
+*   `suilend_getObligationHistory`: Fetch the transaction history for an obligation.
+
+### 🛠️ Common Utilities
+
+*   `common_formatTokenAmount`: Convert raw token amounts to human-readable strings.
+*   `common_parseTokenAmount`: Convert human-readable strings to raw token amounts for transactions.
+*   `common_shortenAddress`: Shorten Sui addresses for display.
+*   `common_getCoinTypeBySymbol`: Get the full `coinType` and metadata for a token from its symbol.
+
+*(Refer to the Zod schema definitions in `src/mcp/zodSchemas/` for detailed input/output structures for each tool).*
 
 ---
 
