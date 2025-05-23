@@ -147,15 +147,204 @@ Sui Agent Kit is a Node.js server application built with TypeScript. It bridges 
 
 ## Getting Started
 
+Follow these steps to get the Sui Agent Kit up and running on your local machine.
+
 ### Prerequisites
 
-1. **Node.js** (v18+ recommended)
-2. **Sui Wallet** (mnemonic or Bech32-format private key, funded with SUI and any test assets)
-3. **Git** (for cloning the repository)
+1.  **Node.js:** Version 18.x or later is highly recommended (as per `tsx` and modern dependencies).
+2.  **npm or yarn:** Package manager for Node.js.
+3.  **Sui Wallet Private Key:** You'll need a Sui private key in **Bech32 format** (starting with `suiprivkey1...`). This key corresponds to the wallet the Agent Kit will use to sign transactions.
+    *   **IMPORTANT:** This wallet must be funded with SUI for gas fees and any assets you intend to interact with (e.g., SUI for deposits in Suilend or staking in SuiSpring).
+4.  **Git:** For cloning the repository.
 
 ### Installation
 
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/ParaDevsAI/Sui-Agent-Kit-SuiLend-SuiSpring
+    cd sui-agent-kit-suispring-suilend
+    ```
+
+2.  **Install Dependencies:**
+    ```bash
+    npm install
+    # OR if you prefer yarn
+    # yarn install
+    ```
+
+### Configuration
+
+1.  **Create `.env` File:**
+    In the root directory of the project (`sui-agent-kit-suispring-suilend`), create a file named `.env`.
+
+2.  **Add Environment Variables:**
+    Open the `.env` file and add your Sui private key. You can also specify the RPC URL if you want to override the default (which is typically Mainnet if not specified otherwise in protocol configs).
+
+    ```env
+    # Your Agent's Sui Wallet Private Key (Bech32 format)
+    SUI_MAINNET_PRIVATE_KEY="suiprivkey1yourlongprivatekeystringgoeshere..."
+
+    # Optional: Sui RPC URL (defaults to Mainnet if not set, or if protocol configs specify it)
+    # SUI_RPC_URL="https://fullnode.mainnet.sui.io:443"
+    ```
+
+    **⚠️ CRITICAL SECURITY WARNING ⚠️**
+    *   The `SUI_MAINNET_PRIVATE_KEY` grants full control over the associated Sui wallet.
+    *   **NEVER commit your `.env` file containing a real private key to any Git repository, especially a public one.** The provided `.gitignore` file should already exclude `.env`.
+    *   For development and testing, it is strongly recommended to use a dedicated **devnet or testnet wallet** with only test funds.
+    *   Ensure this wallet is adequately funded for gas and any DeFi operations you intend the agent to perform.
+
+### Build the Kit
+
+To compile the TypeScript code into JavaScript (output to `dist/` directory):
+
 ```bash
-git clone https://github.com/ParaDevsAI/Sui-Agent-Kit-SuiLend-SuiSpring.git
-cd Sui-Agent-Kit-SuiLend-SuiSpring
-npm install
+npm run build
+```
+
+### Running the Sui Agent Kit Server
+
+*   **For Development (with hot-reloading via `tsx`):**
+    ```bash
+    npm run dev
+    ```
+    This command uses `tsx` to run `src/main.ts` directly, recompiling on changes.
+
+*   **For Production (after building with `npm run build`):**
+    ```bash
+    npm start
+    # This typically runs: node dist/main.js
+    ```
+
+Upon successful startup, you should see log messages indicating the MCP server has started and is ready to accept connections and tool calls via stdio. The active wallet address derived from your private key will also be logged.
+
+## Connecting an MCP Client (e.g., MCP Inspector)
+
+The Sui Agent Kit server communicates via **stdio (standard input/output)** using JSON-RPC 2.0 messages, as per the Model Context Protocol. To interact with it, you'll need an MCP client. The `@modelcontextprotocol/inspector` is an excellent tool for this.
+
+You can configure the MCP Inspector (or other MCP clients that support JSON configuration) using an `mcp.json` (or similar) file. This file tells the client how to launch and manage your Sui Agent Kit server process.
+
+**Example `mcp.json` Configuration:**
+
+Create an `mcp.json` file (e.g., in your user home directory, or wherever your MCP client expects it). **You MUST replace `YOUR_ABSOLUTE_PATH_TO` placeholders with the correct absolute paths on your system.**
+
+```json
+{
+  "mcpServers": {
+    "sui-agent-kit": {
+      "command": "node",
+      "args": [
+        "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend/dist/main.js"
+      ],
+      "cwd": "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend",
+      "env": {
+        // Optional: Override or set environment variables here.
+        // If SUI_MAINNET_PRIVATE_KEY is in your project's .env, you might not need it here.
+        // "SUI_MAINNET_PRIVATE_KEY": "suiprivkey1...from_mcp_json_override", 
+        // "SUI_RPC_URL": "https://fullnode.testnet.sui.io:443"
+      }
+    }
+  }
+}
+```
+
+**Key Parts to Customize in `mcp.json`:**
+
+*   **`"args"`**: The most critical part is the path to your server's entry point.
+    *   Ensure `YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend/dist/main.js` correctly points to the compiled `main.js` file within your project structure.
+    *   **Windows Users:** Remember to use double backslashes for paths (e.g., `"C:\\Users\\YourUser\\Projects\\sui-agent-kit-suispring-suilend\\dist\\main.js"`).
+    *   **macOS/Linux Users:** Standard forward slashes (e.g., `"/Users/YourUser/Projects/sui-agent-kit-suispring-suilend/dist/main.js"`).
+
+*   **`"cwd"`** (Current Working Directory):
+    *   Set this to the **absolute path of your project's root directory** (`sui-agent-kit-suispring-suilend`). This helps the server correctly locate its `.env` file (if used) and any other relative path dependencies.
+
+*   **`"env"`**:
+    *   Use this section to pass environment variables directly from the MCP client configuration. These can override variables set in the project's `.env` file.
+    *   For instance, you could use this to quickly switch networks (`SUI_RPC_URL`) or test with a different private key without modifying the project's `.env` file.
+    *   **Security Note:** Avoid hardcoding highly sensitive private keys directly in `mcp.json` if this file is shared. Prefer using the project's `.env` file for the primary private key.
+
+**Using `npm run dev` with `mcp.json` (Alternative for Development):**
+
+If you prefer to have the MCP Inspector launch your server in development mode (using `tsx` for hot-reloading), you could modify the `mcp.json` like this:
+
+```json
+{
+  "mcpServers": {
+    "sui-agent-kit-dev": {
+      "command": "npm",
+      "args": [
+        "run",
+        "dev"
+      ],
+      "cwd": "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend",
+      "env": {}
+    }
+  }
+}
+```
+In this case, `npm run dev` (which executes `tsx src/main.ts`) becomes the command. Ensure `npm` is in your system PATH.
+
+### Interacting with the Kit (MCP Inspector CLI Examples)
+
+Once your MCP client (like MCP Inspector) is configured with the `mcp.json` pointing to your server (e.g., aliased as `sui-agent-kit`):
+
+1.  **You do not need to manually start the server (`npm run dev` or `npm start`) if the MCP client is configured to launch it.** The client will manage the server process.
+2.  Open your terminal and use the `mcp-inspector` CLI:
+
+    ```bash
+    # Ensure your mcp.json is discoverable by mcp-inspector (e.g., in ~/.config/mcp/mcp.json or by setting MCP_CONFIG_PATH)
+
+    # Example: Get SUI Balance for the active wallet on mainnet
+    mcp-inspector --server sui-agent-kit --method tools/call --tool-name mystenSui_getSuiBalance --tool-arg network=mainnet
+
+    # Example: List available assets in Suilend's default market on mainnet
+    mcp-inspector --server sui-agent-kit --method tools/call --tool-name suilend_getSuilendMarketAssets --tool-arg network=mainnet
+
+    # Example: Stake 0.05 SUI for ParaSUI on mainnet (ensure active wallet has SUI)
+    mcp-inspector --server sui-agent-kit --method tools/call --tool-name springSui_stakeSuiForParaSui --tool-arg amountSuiToStake=0.05 --tool-arg network=mainnet
+
+    # Example: Get User Obligation Info from Suilend on mainnet (prerequisite for many Suilend actions)
+    mcp-inspector --server sui-agent-kit --method tools/call --tool-name suilend_getUserObligationInfo --tool-arg network=mainnet
+    
+    # Example: Get coin type for "USDC" on mainnet
+    mcp-inspector --server sui-agent-kit --method tools/call --tool-name common_getCoinTypeBySymbol --tool-arg symbol=USDC --tool-arg network=mainnet
+    ```
+
+    *   Replace `sui-agent-kit` with the server alias you defined in your `mcp.json`.
+    *   Consult the tool definitions in `src/mcp/zodSchemas/` for the exact names and required/optional arguments for each tool.
+    *   The output will be JSON responses from the server.
+
+## Technical Deep Dive (Recap)
+
+*   **MCP Server (`src/mcp/server.ts`):** Orchestrates tool registration and request handling.
+*   **Zod Schemas (`src/mcp/zodSchemas/`):** Provide data validation and clear API contracts for AI.
+*   **Tool Handlers (`src/mcp/toolHandlers/`):** Bridge MCP calls to protocol-specific actions.
+*   **Internal SDK Client Manager (`src/mcp/internalSdkClientManager.ts`):** Centralizes SDK client instances and active wallet access.
+*   **Protocol Actions (`src/protocols/**/actions.ts`):** Encapsulate the core business logic using protocol SDKs.
+*   **Protocol Clients & Configs (`src/protocols/**/client.ts`, `src/protocols/**/config.ts`):** Manage SDK initialization and static configurations.
+*   **Common Utilities (`src/common/`):** Reusable functions for data transformation and common tasks.
+
+## Project Status (Sui Overflow 2025 MVP)
+
+*   ✅ **Core Infrastructure:** MCP server, wallet management, Zod validation, and tool handling framework are stable and robust.
+*   ✅ **MystenSui Integration:** Comprehensive set of tools for core Sui operations.
+*   ✅ **SpringSui Integration:** Full support for discovering LSTs, staking, redeeming, and fetching user/market data.
+*   ✅ **Suilend Integration:** Extensive capabilities for managing obligations, deposits, borrows, and market data retrieval.
+*   ⚠️ **Steamm (DEX) Integration:** Initial scaffolding and some actions exist but are **currently disabled/paused** in the MCP server for this MVP due to complexities encountered during initial development. Planned for future robust implementation.
+*   🧪 **Testing:** Basic Jest test structure is in place (`tests/`). Focus has been on action-level tests. Further unit and integration test coverage is a priority for post-hackathon development.
+
+## Future Roadmap: Expanding the Agent Horizon
+
+The Sui Agent Kit is a living project with a bright future:
+
+*   🌟 **Activate Steamm DEX Integration:** Fully implement and enable robust tools for token swaps, liquidity provision, and route finding via Steamm.
+*   ➕ **Broader Protocol Support:** Integrate with other key Sui DeFi protocols (e.g., other AMMs/DEXs, perpetuals platforms, yield aggregators, NFT marketplaces).
+*   🤖 **Advanced AI Agent Showcases:** Develop and open-source example AI agents (e.g., in Python) that demonstrate sophisticated DeFi strategies using the kit.
+*   🔐 **Enhanced Security & Permissioning:** Explore options for more granular control, potentially integrating with wallet standards for delegated execution or multi-sig setups for production agents.
+*   📡 **Real-time Event Streaming:** Enable agents to subscribe to on-chain events for reactive decision-making.
+*   📈 **Comprehensive Test Suite:** Implement extensive unit, integration, and end-to-end tests.
+*   🌐 **Community-Driven Expansion:** Foster a community around the kit to contribute new tools and protocol integrations.
+
+## Contributing
+
+This project was initiated for the Sui Overflow 2025 Hackathon, and we believe in the power of open collaboration! We enthusiastically welcome contributions. Whether it's reporting bugs, suggesting features, improving documentation, or submitting pull requests for new tools or protocol integrations, your input is valuable.
