@@ -184,7 +184,7 @@ Follow these steps to get the Sui Agent Kit up and running on your local machine
     ```bash
     npm install
     # OR if you prefer yarn
-    # yarn install
+    # yarn install 
     ```
 
 ### Configuration
