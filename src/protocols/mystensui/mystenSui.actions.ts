@@ -560,14 +560,14 @@ export async function transferSuiToMany(
   }
 }
 
-export async function transferFungibleTokensToMany(
+export async function transferFungTokensToMany(
   suiClient: SuiClient,
   wallet: MvpWalletAdapter,
   tokenCoinType: string,
   tokenDecimals: number,
   transfers: Array<{ recipientAddress: string; amount: string }>
 ): Promise<SuiTransactionBlockResponse | null> {
-  const logPrefix = `[SDK ACTION][transferFungibleTokensToMany][${tokenCoinType}]`;
+  const logPrefix = `[SDK ACTION][transferFungTokensToMany][${tokenCoinType}]`;
   console.warn(`${logPrefix} Attempting to transfer token to multiple recipients.`);
 
   if (!wallet.address) {

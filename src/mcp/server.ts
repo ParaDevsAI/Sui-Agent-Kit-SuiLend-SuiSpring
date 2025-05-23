@@ -7,7 +7,7 @@ import {
     getSuiBalanceSchema, getTokenMetadataSchema, getUserTokenBalanceSchema, 
     transferSuiSchema, /* transferFungibleTokenSchema, */ getUserRecentTxsSchema,
     transferSuiToManySchema,
-    transferFungibleTokensToManySchema
+    transferFungTokensToManySchema
 } from './zodSchemas/mystenSuiSchemas';
 import {
     formatTokenAmountSchema,
@@ -52,7 +52,7 @@ import {
     handleGetSuiBalance, handleGetTokenMetadata, handleGetUserTokenBalance, 
     handleTransferSui, /* handleTransferFungibleToken, */ handleGetUserRecentTxs,
     handleTransferSuiToMany,
-    handleTransferFungibleTokensToMany // Added for multi-send fungible tokens
+    handleTransferFungTokensToMany // Added for multi-send fungible tokens
 } from './toolHandlers/mystenSuiHandlers';
 import {
     handleFormatTokenAmount,
@@ -141,7 +141,7 @@ export function registerMcpTools(server: McpServer, clientManager: InternalSdkCl
     server.tool('mystenSui_getUserTokenBalance', getUserTokenBalanceSchema.shape, (inputs: z.infer<typeof getUserTokenBalanceSchema>) => handleGetUserTokenBalance(inputs, clientManager));
     server.tool('mystenSui_transferSui', transferSuiSchema.shape, (inputs: z.infer<typeof transferSuiSchema>) => handleTransferSui(inputs, clientManager));
     server.tool('mystenSui_transferSuiToMany', transferSuiToManySchema.shape, (inputs: z.infer<typeof transferSuiToManySchema>) => handleTransferSuiToMany(inputs, clientManager));
-    server.tool('mystenSui_transferFungibleTokensToMany', transferFungibleTokensToManySchema.shape, (inputs: z.infer<typeof transferFungibleTokensToManySchema>) => handleTransferFungibleTokensToMany(inputs, clientManager));
+    server.tool('mystenSui_transferFungTokensToMany', transferFungTokensToManySchema.shape, (inputs: z.infer<typeof transferFungTokensToManySchema>) => handleTransferFungTokensToMany(inputs, clientManager));
     server.tool('mystenSui_getUserRecentTxs', getUserRecentTxsSchema.shape, (inputs: z.infer<typeof getUserRecentTxsSchema>) => handleGetUserRecentTxs(inputs, clientManager));
 
     // Common Utility Tools

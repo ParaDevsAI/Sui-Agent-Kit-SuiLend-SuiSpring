@@ -22,3 +22,5 @@ backup/
 
 # TypeScript cache
 *.tsbuildinfo
+
+*.md

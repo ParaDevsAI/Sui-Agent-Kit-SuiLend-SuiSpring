@@ -28,6 +28,13 @@ import { SuiNetwork } from '@/protocols/mystensui/mystenSui.config';
 import { getTokenMeta } from '@/protocols/mystensui/mystenSui.actions';
 import { LiquidStakingObjectInfo } from '@suilend/springsui-sdk/client';
 
+interface SimplifiedLstPoolInfo {
+    coinType: string; // This is the LST's full type, e.g., "...::afsui::AFSUI"
+    symbol?: string;   // Extracted from coinType if possible, e.g., "AFSUI"
+    lstPoolId: string; // This is the ID of the LiquidStakingObjectInfo (Market ID)
+    // weightHookId could also be included if deemed essential for a summary
+}
+
 export async function handleGetLstSuiExchangeRate(
     inputs: z.infer<typeof getLstSuiExchangeRateSchema>,
     clientManager: InternalSdkClientManager
@@ -124,8 +131,26 @@ export async function handleDiscoverLstPools(
     try {
         const networkArg = inputs.network || 'mainnet';
         const suiClient = clientManager.getSuiClientInstance(networkArg as Exclude<SuiNetwork, 'custom'>);
-        const pools = await sdkDiscoverSpringSuiLstPools(suiClient);
-        return createTextOutput(pools, 2);
+        // sdkDiscoverSpringSuiLstPools returns Record<string, LiquidStakingObjectInfo>
+        // where the key is the LST coin type, and value is LiquidStakingObjectInfo
+        const poolsMap: Record<string, LiquidStakingObjectInfo> = await sdkDiscoverSpringSuiLstPools(suiClient);
+
+        const simplifiedPools: SimplifiedLstPoolInfo[] = Object.entries(poolsMap).map(([coinType, poolInfo]) => {
+            let symbol = 'N/A';
+            const typeParts = coinType.split('::');
+            if (typeParts.length > 0) {
+                symbol = typeParts[typeParts.length -1]; // Assumes symbol is the last part of the coinType
+            }
+            
+            return {
+                coinType: coinType, // The key from the map is the LST's coin type
+                symbol: symbol,
+                lstPoolId: poolInfo.id, // The ID of the LiquidStakingObjectInfo (Market ID)
+                // weightHookId: poolInfo.weightHookId, // Optionally include this
+            };
+        });
+
+        return createTextOutput(simplifiedPools, 2);
     } catch (error: any) {
         return createErrorOutput('Failed to discover SpringSui LST pools.', error);
     }

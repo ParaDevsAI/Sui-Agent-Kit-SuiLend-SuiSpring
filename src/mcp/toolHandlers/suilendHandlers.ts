@@ -37,6 +37,7 @@ import { UserSuilendObligationIdentifiers } from '../../protocols/suilend/suilen
 import { InternalSdkClientManager } from '../internalSdkClientManager';
 import { SUI_TYPE_ARG } from '../../protocols/suilend/suilend.config';
 import { MvpWalletAdapter } from '@/protocols/mystensui/mystenSui.actions';
+import { SuilendMarketAssetLarge } from '@/protocols/suilend/suilend.types'; // Ensure SuilendMarketAssetLarge is imported
 
 // Schema Zod para os parâmetros da ferramenta getSuilendMarketAssets
 export const SuilendGetMarketAssetsParams = z.object({
@@ -44,6 +45,18 @@ export const SuilendGetMarketAssetsParams = z.object({
   marketId: z.string().optional(),
   format: z.enum(['small', 'large']).optional().default('small')
 });
+
+// Define the simplified interface
+interface SimplifiedSuilendMarketAsset {
+    symbol: string;
+    coinType: string;
+    priceUsd: string;
+    totalDepositedUsd: string;
+    totalBorrowedUsd: string;
+    depositApyPercent: string;
+    borrowApyPercent: string;
+    openLtvPercent: number;
+}
 
 export async function handleGetSuilendMarketAssets(
     inputs: z.infer<typeof SuilendGetMarketAssetsParams>,
@@ -57,8 +70,26 @@ export async function handleGetSuilendMarketAssets(
             throw new Error(`SuilendSDK could not be initialized for market ${inputs.marketId || 'default'} on network ${inputs.network}`);
         }
 
-        const result = await sdkGetSuilendMarketAssets(suilendClient, suiClient, inputs.format);
-        return createTextOutput(result, 2);
+        // sdkGetSuilendMarketAssets always returns SuilendMarketAssetLarge[]
+        const fullMarketAssets: SuilendMarketAssetLarge[] = await sdkGetSuilendMarketAssets(suilendClient, suiClient);
+
+        // If format is not 'large', default to small/simplified output.
+        if (inputs.format !== 'large') {
+            const simplifiedAssets: SimplifiedSuilendMarketAsset[] = fullMarketAssets.map(asset => ({
+                symbol: asset.asset.symbol,
+                coinType: asset.asset.coinType,
+                priceUsd: asset.asset.priceUsd,
+                totalDepositedUsd: asset.marketStats.totalDepositedUsd,
+                totalBorrowedUsd: asset.marketStats.totalBorrowedUsd,
+                depositApyPercent: asset.currentApys.depositApyPercent,
+                borrowApyPercent: asset.currentApys.borrowApyPercent,
+                openLtvPercent: asset.config.openLtvPercent,
+            }));
+            return createTextOutput(simplifiedAssets, 2);
+        }
+
+        // Otherwise, return the full large assets (current behavior for format: 'large')
+        return createTextOutput(fullMarketAssets, 2);
     } catch (error: any) {
         return createErrorOutput(`Error fetching Suilend market assets: ${error.message}`, error);
     }

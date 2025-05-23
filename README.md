@@ -67,7 +67,7 @@ The Sui Agent Kit provides a rich set of tools, categorized by protocol:
 *   `mystenSui_getUserTokenBalance`: Get the balance of a specific fungible token for the active agent.
 *   `mystenSui_transferSui`: Execute SUI transfers.
 *   `mystenSui_transferSuiToMany`: Transfer SUI to multiple recipients in a single transaction.
-*   `mystenSui_transferFungibleTokensToMany`: Transfer a specific fungible token to multiple recipients.
+*   `mystenSui_transferFungTokensToMany`: Transfer a specific fungible token to multiple recipients.
 *   `mystenSui_getUserRecentTxs`: Fetch recent transaction history for the active agent.
 
 ### 🌱 SuiSpring (Liquid Staking)

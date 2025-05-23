@@ -7,7 +7,7 @@ import {
     transferSuiSchema,
     getUserRecentTxsSchema,
     transferSuiToManySchema, // Added for multi-send
-    transferFungibleTokensToManySchema // Added for multi-send fungible tokens
+    transferFungTokensToManySchema // Added for multi-send fungible tokens
 } from '../zodSchemas/mystenSuiSchemas';
 import {
     getSuiBalance as sdkGetSuiBalance,
@@ -16,12 +16,12 @@ import {
     // transferFungibleToken as sdkTransferFungibleToken, // Comentado
     transferSui as sdkTransferSui,
     transferSuiToMany as sdkTransferSuiToMany, // Added for multi-send
-    transferFungibleTokensToMany as sdkTransferFungibleTokensToMany, // Added for multi-send fungible tokens
+    transferFungTokensToMany as sdkTransferFungTokensToMany, // Added for multi-send fungible tokens
     getUserRecentTransactions as sdkGetUserRecentTransactions,
     // MvpWalletAdapter // This type is for internal SDK use, not directly for MCP handler params
 } from '@/protocols/mystensui/mystenSui.actions';
 import { InternalSdkClientManager } from '../internalSdkClientManager';
-import { SuiTransactionBlockResponse, PaginatedCoins } from '@mysten/sui/client'; // Adicionado PaginatedCoins
+import { SuiTransactionBlockResponse, PaginatedCoins, SuiGasData } from '@mysten/sui/client'; // Adicionado PaginatedCoins, SuiGasData
 import { Transaction, TransactionArgument } from '@mysten/sui/transactions'; // Corrected: Removed Coin
 import { McpToolOutput, createErrorOutput, createTextOutput } from '../mcpUtils';
 import { SUI_DECIMALS } from '@mysten/sui/utils'; // For SUI_DECIMALS
@@ -332,11 +332,11 @@ export async function handleTransferSuiToMany(
     }
 }
 
-export async function handleTransferFungibleTokensToMany(
-    inputs: z.infer<typeof transferFungibleTokensToManySchema>,
+export async function handleTransferFungTokensToMany(
+    inputs: z.infer<typeof transferFungTokensToManySchema>,
     clientManager: InternalSdkClientManager
 ): Promise<McpToolOutput> {
-    const logPrefix = `[HANDLER][handleTransferFungibleTokensToMany][${inputs.tokenCoinType}]`;
+    const logPrefix = `[HANDLER][handleTransferFungTokensToMany][${inputs.tokenCoinType}]`;
     console.warn(`${logPrefix} Received request to transfer token to multiple recipients.`);
 
     try {
@@ -352,8 +352,8 @@ export async function handleTransferFungibleTokensToMany(
         const networkArg = inputs.network || 'mainnet';
         const suiClient = clientManager.getSuiClientInstance(networkArg as Exclude<SuiNetwork, 'custom'>);
         
-        console.warn(`${logPrefix} Calling sdkTransferFungibleTokensToMany action for sender ${walletAdapter.address}...`);
-        const txResponse = await sdkTransferFungibleTokensToMany(
+        console.warn(`${logPrefix} Calling sdkTransferFungTokensToMany action for sender ${walletAdapter.address}...`);
+        const txResponse = await sdkTransferFungTokensToMany(
             suiClient,
             walletAdapter,
             inputs.tokenCoinType,
@@ -388,6 +388,20 @@ export async function handleTransferFungibleTokensToMany(
     }
 }
 
+interface SimplifiedTransactionSummary {
+    digest: string;
+    timestampMs: string | null;
+    status: 'success' | 'failure';
+    error: string | null; // Populated if status is 'failure'
+    gasUsed: string; // e.g., "net gas cost in MIST"
+    gasOwner: string | null; // Address of the gas object owner
+    sender: string | null;
+    transactionKind: string;
+    createdCount: number;
+    mutatedCount: number;
+    deletedCount: number;
+}
+
 export async function handleGetUserRecentTxs(
     inputs: z.infer<typeof getUserRecentTxsSchema>,
     clientManager: InternalSdkClientManager
@@ -398,17 +412,64 @@ export async function handleGetUserRecentTxs(
         if (!userAddress) {
             throw new Error("Active user context (address) not found. Configure SUI_MAINNET_PRIVATE_KEY or connect wallet.");
         }
-        const result = await sdkGetUserRecentTransactions(suiClient, userAddress, inputs.limit);
+        const fullTransactions: SuiTransactionBlockResponse[] = await sdkGetUserRecentTransactions(suiClient, userAddress, inputs.limit);
         
-        const limit = inputs.limit ?? 10; // Defaulting to 10 if undefined, matching schema default
-        const recentTransactions = result.slice(0, limit);
+        const limit = inputs.limit ?? 10; 
+        const recentFullTransactions = fullTransactions.slice(0, limit);
+
+        const simplifiedTransactions: SimplifiedTransactionSummary[] = recentFullTransactions.map(tx => {
+            const effects = tx.effects;
+            const gasUsedData = effects?.gasUsed;
+            let totalGasUsed = '0';
+            if (gasUsedData) {
+                totalGasUsed = new BigNumber(gasUsedData.computationCost)
+                    .plus(gasUsedData.storageCost)
+                    .minus(gasUsedData.storageRebate)
+                    .toString();
+            }
+
+            let txKindString = 'Unknown';
+            if (tx.transaction?.data.transaction) {
+                const kindObject = tx.transaction.data.transaction;
+                if ('ProgrammableTransaction' in kindObject) txKindString = 'ProgrammableTransaction';
+                else if ('ChangeEpoch' in kindObject) txKindString = 'ChangeEpoch';
+                else txKindString = Object.keys(kindObject)[0] || 'Unknown';
+            }
+
+            let gasObjectOwnerString: string | null = null;
+            if (effects?.gasObject.owner && typeof effects.gasObject.owner === 'object') {
+                if ('AddressOwner' in effects.gasObject.owner) {
+                    gasObjectOwnerString = effects.gasObject.owner.AddressOwner;
+                } else if ('ObjectOwner' in effects.gasObject.owner) {
+                    gasObjectOwnerString = effects.gasObject.owner.ObjectOwner;
+                } else if ('Shared' in effects.gasObject.owner) {
+                    gasObjectOwnerString = `Shared(version:${effects.gasObject.owner.Shared.initial_shared_version})`;
+                } else {
+                    gasObjectOwnerString = 'ImmutableOrUnknown';
+                }
+            }
+
+            return {
+                digest: tx.digest,
+                timestampMs: tx.timestampMs || null,
+                status: effects?.status.status || 'failure',
+                error: effects?.status.error || null,
+                gasUsed: totalGasUsed,
+                gasOwner: gasObjectOwnerString,
+                sender: tx.transaction?.data.sender || null,
+                transactionKind: txKindString,
+                createdCount: effects?.created?.length || 0,
+                mutatedCount: effects?.mutated?.length || 0,
+                deletedCount: effects?.deleted?.length || 0,
+            };
+        });
 
         return {
             content: [
                 {
                     type: "text",
-                    text: JSON.stringify(recentTransactions, null, 2),
-                    details: `Showing ${recentTransactions.length} of ${result.length} fetched transactions.`
+                    text: JSON.stringify(simplifiedTransactions, null, 2),
+                    details: `Showing ${simplifiedTransactions.length} of ${fullTransactions.length} fetched transactions. Output simplified.`
                 }
             ]
         };

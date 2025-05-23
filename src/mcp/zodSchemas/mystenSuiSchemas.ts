@@ -54,7 +54,7 @@ export const transferSuiToManySchema = z.object({
     network: networkSchema.optional()
 }).describe("Executes a transfer of SUI (the native token) from the active wallet in the MCP server to multiple specified recipient addresses in a single transaction. Returns the transaction digest upon successful execution.");
 
-export const transferFungibleTokensToManySchema = z.object({
+export const transferFungTokensToManySchema = z.object({
     tokenCoinType: z.string().describe("The coin type of the fungible token to transfer (e.g., '0x...::para_sui::PARA_SUI')."),
     tokenDecimals: z.number().int().min(0).describe("The number of decimals the token uses."),
     transfers: z.array(z.object({
