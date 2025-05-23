@@ -187,17 +187,17 @@ Create an `mcp.json` file (e.g., in your user home directory, or wherever your M
 ```json
 {
   "mcpServers": {
-    "sui-agent-kit": { // You can name this server alias anything you like
+    "sui-agent-kit": {
       "command": "node",
       "args": [
-        "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend/dist/main.js" // Path to the compiled JS entry point
+        "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend/dist/main.js"
       ],
-      "cwd": "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend", // Path to the project's root directory
+      "cwd": "YOUR_ABSOLUTE_PATH_TO/sui-agent-kit-suispring-suilend",
       "env": {
         // Optional: Override or set environment variables here.
         // If SUI_MAINNET_PRIVATE_KEY is in your project's .env, you might not need it here.
         // "SUI_MAINNET_PRIVATE_KEY": "suiprivkey1...from_mcp_json_override", 
-        // "SUI_RPC_URL": "https://fullnode.testnet.sui.io:443" // Example to force testnet via mcp.json
+        // "SUI_RPC_URL": "https://fullnode.testnet.sui.io:443"
       }
     }
   }
@@ -227,7 +227,7 @@ If you prefer to have the MCP Inspector launch your server in development mode (
 {
   "mcpServers": {
     "sui-agent-kit-dev": {
-      "command": "npm", // Or "yarn" if you use yarn
+      "command": "npm",
       "args": [
         "run",
         "dev"
