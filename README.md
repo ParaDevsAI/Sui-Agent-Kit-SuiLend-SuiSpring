@@ -117,7 +117,7 @@ Follow these steps to get the Sui Agent Kit up and running on your local machine
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/your-username/sui-agent-kit-suispring-suilend.git # Replace with your actual repository URL
+    git clone https://github.com/ParaDevsAI/Sui-Agent-Kit-SuiLend-SuiSpring
     cd sui-agent-kit-suispring-suilend
     ```
 
