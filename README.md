@@ -363,3 +363,17 @@ The Sui Agent Kit is a living project with a bright future:
 ## Contributing
 
 This project was initiated for the Sui Overflow 2025 Hackathon, and we believe in the power of open collaboration! We enthusiastically welcome contributions. Whether it's reporting bugs, suggesting features, improving documentation, or submitting pull requests for new tools or protocol integrations, your input is valuable.
+
+<div align="center">
+
+## 💝 Support Us
+
+Support our work by using **ParaSui** liquid staking on SUI: [springsui.com/SUI-ParaSui](https://springsui.com/SUI-ParaSui)
+
+**Built with ❤️ for the Sui Overflow 2025 Hackathon**
+
+*Let's build the future of decentralized finance on Sui, together!*
+
+**🌊 [Navi Kit Repository](https://github.com/ParaDevsAI/Sui-Agent-Kit-Navi) | 🏦 [SuiLend+SuiSpring Kit Repository](https://github.com/ParaDevsAI/Sui-Agent-Kit-SuiLend-SuiSpring)**
+
+</div>
